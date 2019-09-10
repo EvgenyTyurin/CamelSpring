@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+       ">
+
+    <!-- To have access to ActiveMQ queue -->
+    <bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="vm://localhost?broker.persistent=false" />
+    </bean>
+
+    <!-- Camel context -->
+    <camelContext xmlns="http://camel.apache.org/schema/spring">
+        <!-- Messages from queue go to myBean.appendCamel, then to console -->
+        <route>
+            <from uri="activemq:queue:test.queue" />
+            <to uri="bean:myBean?method=appendCamel"/>
+            <to uri="stream:out" />
+        </route>
+    </camelContext>
+
+    <!-- My class to modify messages received from queue -->
+    <bean id="myBean" class="evgenyt.cameldemo.MyBean"/>
+
+</beans>
